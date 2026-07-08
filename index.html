@@ -282,9 +282,73 @@
     color: var(--sage-dim); font-size: 14px; font-style: italic;
   }
 
+  /* ---------- visual garnish ---------- */
+  .sec-head::before {
+    content: "♠ ♥ ♦ ♣";
+    font-size: 12px; letter-spacing: 0.85em; color: var(--gold); opacity: .45;
+  }
+  .mfront { position: relative; }
+  .mfront .pip.corner {
+    position: absolute; bottom: 12px; right: 14px; transform: rotate(180deg); font-size: 22px;
+  }
+  .maxim { transition: transform .22s ease; }
+  .maxim:hover { transform: translateY(-6px); }
+
+  /* hero card fan */
+  .fan { position: relative; height: 185px; width: min(430px, 92%); margin: 46px auto 4px; pointer-events: none; }
+  .fancard {
+    position: absolute; left: 50%; bottom: 0; width: 94px; height: 132px; margin-left: -47px;
+    background: #fff; border: 1px solid #D8D0BC; border-radius: 9px;
+    box-shadow: 0 12px 26px -12px rgba(0,0,0,.55);
+    transform-origin: 50% 135%;
+    transform: rotate(var(--rot, 0deg));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-weight: 800;
+  }
+  .fancard .big { font-size: 46px; }
+  .fancard .idx { position: absolute; top: 7px; left: 9px; font-size: 15px; line-height: 1; text-align: center; }
+  .fancard .idx small { display: block; font-size: 13px; margin-top: 1px; }
+  .fancard .idx.flip { top: auto; left: auto; bottom: 7px; right: 9px; transform: rotate(180deg); }
+  .fancard.red { color: var(--suit-red); }
+  .fancard.blk { color: var(--suit-black); }
+  .fancard:nth-child(1) { --rot: -28deg; --fd: .1s; }
+  .fancard:nth-child(2) { --rot: -14deg; --fd: .22s; }
+  .fancard:nth-child(3) { --rot: 0deg;   --fd: .34s; }
+  .fancard:nth-child(4) { --rot: 14deg;  --fd: .46s; }
+  .fancard:nth-child(5) { --rot: 28deg;  --fd: .58s; }
+
+  /* ---------- motion (skipped entirely for reduced-motion) ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @keyframes fanIn {
+      from { opacity: 0; transform: rotate(0deg) translateY(70px); }
+      to   { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+    }
+    @keyframes winPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(217,164,65,0); }
+      50%      { box-shadow: 0 0 18px 4px rgba(217,164,65,.75); }
+    }
+    @keyframes bumpNum {
+      0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); }
+    }
+    .fancard { animation: fanIn .85s cubic-bezier(.2,.85,.3,1.12) var(--fd, 0s) both; }
+    .reveal { opacity: 0; }
+    .reveal.in { opacity: 1; animation: riseIn .65s cubic-bezier(.2,.7,.3,1) var(--d, 0s) both; }
+    .playout.show .trickrow { animation: riseIn .5s ease var(--d, 0s) both; }
+    .playout.show .verdict { animation: riseIn .55s ease var(--d, 0s) both; }
+    .playout.show .pcard.winner { animation: winPulse 1.1s ease var(--d, 0s) 2; }
+    .hcp-total .num.bump { display: inline-block; animation: bumpNum .35s ease; }
+    .hcp-msg.done { display: inline-block; animation: bumpNum .45s ease; }
+    .step-body.fade { animation: riseIn .35s ease both; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .maxim-inner { transition: none; }
     .btn { transition: none; }
+    .maxim { transition: none; }
   }
 </style>
 
@@ -295,6 +359,13 @@
     <h1>Bridge: a small start.
       <span class="sub">You said the little quotes are told to you mid-hand, there's no time to write them down, and they're quickly forgotten. So here they all are, pinned down, each with its <i>why</i> underneath. A rule with a reason sticks.</span>
     </h1>
+    <div class="fan" aria-hidden="true">
+      <div class="fancard blk"><span class="idx">A<small>♠</small></span><span class="big">♠</span><span class="idx flip">A<small>♠</small></span></div>
+      <div class="fancard red"><span class="idx">K<small>♥</small></span><span class="big">♥</span><span class="idx flip">K<small>♥</small></span></div>
+      <div class="fancard red"><span class="idx">Q<small>♦</small></span><span class="big">♦</span><span class="idx flip">Q<small>♦</small></span></div>
+      <div class="fancard blk"><span class="idx">J<small>♣</small></span><span class="big">♣</span><span class="idx flip">J<small>♣</small></span></div>
+      <div class="fancard blk"><span class="idx">10<small>♠</small></span><span class="big">♠</span><span class="idx flip">10<small>♠</small></span></div>
+    </div>
   </header>
 
   <!-- 1 · WHAT YOU ALREADY KNOW -->
@@ -651,6 +722,35 @@
 
 <script>
 (function () {
+  // ----- mirrored corner pips on maxim fronts -----
+  document.querySelectorAll(".mfront").forEach(function (f) {
+    var p = f.querySelector(".pip");
+    if (p) { var c = p.cloneNode(true); c.classList.add("corner"); f.appendChild(c); }
+  });
+
+  // ----- scroll-triggered reveals (skipped for reduced motion) -----
+  var motionOK = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (motionOK && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0, rootMargin: "0px 0px -50px 0px" });
+    var mi = 0;
+    document.querySelectorAll(".sec-head, section p.lead, .panel, .maxim, .table-felt, .ladder, .aside, footer").forEach(function (t) {
+      t.classList.add("reveal");
+      if (t.classList.contains("maxim")) { t.style.setProperty("--d", ((mi++) % 3) * 0.1 + "s"); }
+      t.addEventListener("animationend", function () {
+        t.classList.remove("reveal", "in"); t.style.removeProperty("--d");
+      }, { once: true });
+      io.observe(t);
+    });
+    // safety net: never leave content hidden if reveals can't run
+    setTimeout(function () {
+      document.querySelectorAll(".reveal:not(.in)").forEach(function (t) { t.classList.add("in"); });
+    }, 3000);
+  }
+
   // ----- maxim flip cards -----
   document.querySelectorAll(".maxim").forEach(function (card) {
     card.addEventListener("click", function () {
@@ -699,13 +799,13 @@
     var line = lines[key];
     var html = "";
     line.tricks.forEach(function (trick, i) {
-      html += '<div class="trickrow"><span class="tno">Trick ' + (i + 1) + '</span><span class="cards">';
+      html += '<div class="trickrow" style="--d:' + (0.15 + i * 0.45) + 's"><span class="tno">Trick ' + (i + 1) + '</span><span class="cards">';
       trick.cards.forEach(function (c, j) {
         html += '<span class="pcard red' + (c.w ? " winner" : "") + '" title="' + trick.seats[j] + '">' + c.t + "</span>";
       });
       html += "</span><span class=\"note\">" + trick.note + "</span></div>";
     });
-    html += '<div class="verdict">' + line.verdict + "</div>";
+    html += '<div class="verdict" style="--d:' + (0.35 + line.tricks.length * 0.45) + 's">' + line.verdict + "</div>";
     playout.innerHTML = html;
     playout.classList.add("show");
     btnR.style.display = "inline-block";
@@ -729,6 +829,7 @@
       var pts = parseInt(h.getAttribute("data-pts"), 10);
       if (h.classList.toggle("counted")) total += pts; else total -= pts;
       num.textContent = total;
+      num.classList.remove("bump"); void num.offsetWidth; num.classList.add("bump");
       var allDone = Array.prototype.every.call(honours, function (x) { return x.classList.contains("counted"); });
       if (allDone) {
         msg.textContent = "That's the lot: 12 points and five spades. Open 1♠ - out loud it means: \"Partner, I have a proper hand and spades is my longest suit.\"";
@@ -758,6 +859,7 @@
   var next = document.getElementById("stepNext");
   function showStep() {
     body.innerHTML = "<h3>" + steps[idx].h + "</h3><p>" + steps[idx].b + "</p>";
+    body.classList.remove("fade"); void body.offsetWidth; body.classList.add("fade");
     count.textContent = "Step " + (idx + 1) + " of " + steps.length;
     prev.disabled = idx === 0;
     next.disabled = idx === steps.length - 1;
