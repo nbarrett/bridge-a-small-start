@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bridge: A Small Start</title>
+</head>
+<body style="margin:0;">
+<style>
+  :root {
+    --felt: #1D4A39;
+    --felt-deep: #143327;
+    --cream: #FBF7EC;
+    --cream-2: #F3EDDC;
+    --ink: #2A251B;
+    --ink-soft: #5C554A;
+    --gold: #D9A441;
+    --gold-deep: #B07E24;
+    --suit-red: #BE3B3B;
+    --suit-black: #2B2B2B;
+    --sage: #A8C3B4;
+    --sage-dim: #7FA08F;
+    --line: #DDD3BC;
+
+    --serif: "Palatino", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 550px at 50% -160px, #266048 0%, var(--felt) 52%, var(--felt-deep) 100%),
+      var(--felt-deep);
+    color: var(--cream);
+    font-family: var(--serif);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 22px 110px; }
+
+  /* ---------- type ---------- */
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 12px; letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--gold); margin: 0;
+  }
+  h1 {
+    font-weight: 700; letter-spacing: -0.01em; text-wrap: balance;
+    font-size: clamp(40px, 8vw, 72px); line-height: 1.02; margin: 14px 0 0;
+  }
+  h1 .sub {
+    display: block; color: var(--sage); font-weight: 400;
+    font-size: clamp(17px, 2.5vw, 21px); margin-top: 20px; line-height: 1.55; max-width: 58ch;
+  }
+  h2 {
+    font-size: clamp(25px, 4vw, 33px); font-weight: 700; letter-spacing: -0.01em;
+    margin: 0; text-wrap: balance;
+  }
+  .kicker {
+    font-family: var(--sans); font-size: 11.5px; letter-spacing: 0.24em;
+    text-transform: uppercase; color: var(--gold);
+  }
+  section { margin-top: 72px; }
+  .sec-head { display: grid; gap: 10px; margin-bottom: 22px; }
+  p.lead { color: var(--sage); font-size: 16.5px; max-width: 62ch; }
+  p.lead b { color: var(--cream); font-weight: 700; }
+
+  /* ---------- cream panels ---------- */
+  .panel {
+    background: var(--cream); color: var(--ink);
+    border-radius: 14px; padding: 26px 28px;
+    box-shadow: 0 24px 60px -30px rgba(0,0,0,.55);
+  }
+  .panel p { max-width: 66ch; }
+  .panel b { color: var(--ink); }
+  .panel .why { color: var(--ink-soft); }
+
+  /* ---------- playing-card chips ---------- */
+  .pcard {
+    display: inline-flex; align-items: center; justify-content: center; gap: 1px;
+    min-width: 34px; height: 46px; padding: 0 6px;
+    background: #fff; border: 1px solid #D8D0BC; border-radius: 5px;
+    font-family: var(--sans); font-weight: 700; font-size: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.14);
+    color: var(--suit-black);
+  }
+  .pcard.red { color: var(--suit-red); }
+  .pcard.dim { opacity: .38; }
+  .handrow { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .seatlab {
+    font-family: var(--sans); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px;
+  }
+
+  /* ---------- maxim flip cards ---------- */
+  .maxims { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .maxim { perspective: 1100px; cursor: pointer; border: 0; background: none; padding: 0; text-align: left; font: inherit; }
+  .maxim:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 12px; }
+  .maxim-inner {
+    display: grid; width: 100%; min-height: 260px;
+    transition: transform .55s cubic-bezier(.3,.9,.3,1);
+    transform-style: preserve-3d;
+  }
+  .maxim.flipped .maxim-inner { transform: rotateY(180deg); }
+  .mface {
+    grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 12px; padding: 20px 20px 18px; display: flex; flex-direction: column;
+  }
+  .mfront {
+    background: var(--cream); color: var(--ink);
+    border: 1px solid #E4DCC6;
+    box-shadow: 0 14px 34px -18px rgba(0,0,0,.5);
+  }
+  .mfront .pip { font-size: 24px; }
+  .mfront .pip.red { color: var(--suit-red); }
+  .mfront .quote {
+    font-size: 19.5px; font-weight: 700; line-height: 1.32; margin: 10px 0 0;
+    letter-spacing: -0.005em; text-wrap: balance;
+  }
+  .mfront .tap {
+    margin-top: auto; font-family: var(--sans); font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--gold-deep);
+  }
+  .mback {
+    background: var(--felt); color: var(--cream);
+    border: 1px solid #2E6A52; transform: rotateY(180deg);
+    box-shadow: 0 14px 34px -18px rgba(0,0,0,.5);
+  }
+  .mback .why-h {
+    font-family: var(--sans); font-size: 10.5px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+  }
+  .mback p { font-size: 14px; line-height: 1.55; margin: 0 0 10px; color: #EAF2EC; }
+  .mback .unless { color: var(--sage); font-size: 13px; }
+  .mback .unless b { color: var(--gold); font-weight: 700; }
+
+  /* ---------- the trick table ---------- */
+  .table-felt {
+    background: linear-gradient(180deg, #235845, #1B4536);
+    border: 1px solid #2E6A52; border-radius: 16px; padding: 26px 22px;
+    box-shadow: inset 0 2px 22px rgba(0,0,0,.28), 0 24px 60px -30px rgba(0,0,0,.55);
+  }
+  .seats {
+    display: grid; gap: 14px;
+    grid-template-areas: ". n ." "w c e" ". s .";
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center; justify-items: center;
+  }
+  .seat { text-align: center; }
+  .seat .seatlab { color: var(--sage); }
+  .seat.you .seatlab { color: var(--gold); font-weight: 700; }
+  .seat-n { grid-area: n; } .seat-s { grid-area: s; }
+  .seat-w { grid-area: w; } .seat-e { grid-area: e; }
+  @media (max-width: 560px) {
+    .seats {
+      grid-template-areas: "n n" "w e" "c c" "s s";
+      grid-template-columns: 1fr 1fr;
+    }
+    .centre { max-width: none; }
+  }
+  .centre { grid-area: c; text-align: center; color: var(--sage); font-size: 13.5px; font-family: var(--sans); max-width: 190px; }
+  .hidden-hand {
+    display: inline-flex; gap: 4px;
+  }
+  .cardback {
+    width: 30px; height: 44px; border-radius: 5px;
+    background: repeating-linear-gradient(45deg, #7E2B2B 0 4px, #942F2F 4px 8px);
+    border: 2px solid #F1E7D0; box-shadow: 0 2px 4px rgba(0,0,0,.25);
+  }
+  .choices { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 22px; }
+  .btn {
+    font-family: var(--sans); font-size: 14px; font-weight: 600;
+    background: var(--gold); color: #2A2008; border: 0; border-radius: 8px;
+    padding: 11px 18px; cursor: pointer; box-shadow: 0 4px 14px -6px rgba(0,0,0,.5);
+    transition: transform .1s, background .15s;
+  }
+  .btn:hover { background: #E4B356; }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 3px solid var(--cream); outline-offset: 2px; }
+  .btn.quiet { background: transparent; color: var(--sage); border: 1px solid #3A755C; box-shadow: none; }
+  .btn.quiet:hover { color: var(--cream); border-color: var(--sage); background: transparent; }
+
+  .playout { margin-top: 22px; display: none; }
+  .playout.show { display: block; }
+  .trickrow {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 12px 0; border-top: 1px dashed #33705A;
+  }
+  .trickrow .tno {
+    font-family: var(--sans); font-size: 11px; letter-spacing: 0.14em; color: var(--sage-dim);
+    text-transform: uppercase; min-width: 52px;
+  }
+  .trickrow .cards { display: flex; gap: 5px; }
+  .trickrow .pcard { height: 40px; min-width: 30px; font-size: 13.5px; }
+  .trickrow .pcard.winner { outline: 3px solid var(--gold); outline-offset: 1px; }
+  .trickrow .note { flex: 1 1 220px; font-size: 13.5px; color: #E7EFE9; }
+  .verdict {
+    margin-top: 16px; padding: 15px 18px; border-radius: 10px;
+    background: rgba(217,164,65,.14); border: 1px solid rgba(217,164,65,.45);
+    font-size: 15px; color: var(--cream);
+  }
+  .verdict b { color: var(--gold); }
+
+  /* ---------- HCP counter ---------- */
+  .hcp-hand { display: grid; gap: 12px; margin: 18px 0 6px; }
+  .hcp-suit { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hcp-suit .pip { width: 22px; font-size: 19px; text-align: center; }
+  .hcp-suit .pip.red { color: var(--suit-red); }
+  .hcard {
+    font: inherit; font-family: var(--sans); font-weight: 700; font-size: 15px;
+    min-width: 36px; height: 48px; border-radius: 6px;
+    background: #fff; border: 1px solid #D8D0BC; color: var(--suit-black);
+    box-shadow: 0 2px 4px rgba(0,0,0,.14); cursor: default; padding: 0 7px;
+  }
+  .hcard.red { color: var(--suit-red); }
+  .hcard.honour { cursor: pointer; border: 2px solid var(--gold-deep); }
+  .hcard.honour:hover { background: #FFF6E2; }
+  .hcard.honour:focus-visible { outline: 3px solid var(--gold-deep); outline-offset: 2px; }
+  .hcard.honour.counted { background: var(--gold); border-color: var(--gold-deep); color: #2A2008; }
+  .hcard.honour.counted::after { content: " ✓"; font-size: 11px; }
+  .hcp-total {
+    font-family: var(--sans); font-size: 15px; margin-top: 14px;
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  }
+  .hcp-total .num {
+    font-size: 30px; font-weight: 800; color: var(--gold-deep);
+    font-variant-numeric: tabular-nums;
+  }
+  .hcp-msg { color: var(--ink-soft); font-size: 14px; }
+  .hcp-msg.done { color: var(--gold-deep); font-weight: 700; }
+  .legend { font-family: var(--sans); font-size: 12.5px; color: var(--ink-soft); letter-spacing: 0.03em; }
+
+  /* ---------- ladder ---------- */
+  .ladder { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-top: 18px; }
+  .rung { background: var(--cream); padding: 14px 18px; display: flex; gap: 14px; align-items: baseline; }
+  .rung .pts {
+    font-family: var(--sans); font-weight: 800; font-size: 17px; color: var(--gold-deep);
+    min-width: 64px; font-variant-numeric: tabular-nums;
+  }
+  .rung .what { font-size: 15px; }
+  .rung .what b { font-weight: 700; }
+
+  /* ---------- stepper ---------- */
+  .stepper { margin-top: 18px; }
+  .step-body { min-height: 116px; }
+  .step-body h3 { margin: 0 0 6px; font-size: 17.5px; }
+  .step-body p { margin: 0; font-size: 15px; color: var(--ink-soft); max-width: 64ch; }
+  .step-nav { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+  .step-count { font-family: var(--sans); font-size: 12.5px; color: var(--ink-soft); letter-spacing: 0.06em; }
+  .btn.ink { background: var(--felt); color: var(--cream); }
+  .btn.ink:hover { background: #266048; }
+  .btn[disabled] { opacity: .4; cursor: default; }
+
+  .duo { display: grid; gap: 18px; grid-template-columns: 1fr; margin: 16px 0; }
+  @media (min-width: 620px) { .duo { grid-template-columns: 1fr 1fr; } }
+
+  /* ---------- score chips ---------- */
+  .score-chips { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 4px; }
+  .chip {
+    background: #fff; border: 1px solid var(--line); border-radius: 999px;
+    font-family: var(--sans); font-size: 14px; padding: 8px 15px; font-weight: 600;
+  }
+  .chip .pip.red { color: var(--suit-red); }
+  .goal {
+    margin-top: 16px; padding: 16px 18px; border-radius: 10px;
+    background: #FDF3DC; border: 1px solid #EBD9AC; font-size: 15px;
+  }
+  .goal b { color: var(--gold-deep); }
+
+  /* ---------- notes & footer ---------- */
+  .aside {
+    border-left: 3px solid var(--gold); padding: 4px 0 4px 18px; margin: 26px 0 0;
+    color: var(--sage); font-size: 15px; max-width: 62ch; font-style: italic;
+  }
+  .aside b { color: var(--cream); font-style: normal; }
+  footer {
+    margin-top: 86px; padding-top: 24px; border-top: 1px solid #2E6A52;
+    color: var(--sage-dim); font-size: 14px; font-style: italic;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .maxim-inner { transition: none; }
+    .btn { transition: none; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header style="padding: 84px 0 8px;">
+    <p class="eyebrow">For Francine · a field guide in plain English</p>
+    <h1>Bridge: a small start.
+      <span class="sub">You said the little quotes are told to you mid-hand, there's no time to write them down, and they're quickly forgotten. So here they all are, pinned down, each with its <i>why</i> underneath. A rule with a reason sticks.</span>
+    </h1>
+  </header>
+
+  <!-- 1 · WHAT YOU ALREADY KNOW -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter one · Start from what you know</span>
+      <h2>You already read cards in runs and sets</h2>
+    </div>
+    <p class="lead">You know Machiavelli inside out, which means you already see a hand the way bridge players do: <b>runs</b> (K-Q-J of a suit) and <b>sets</b> (length, groups, shape). That skill is half of bridge. When this page says "a sequence" or "your longest suit", you already have the eye for it.</p>
+    <p class="lead">The genuinely new muscle is the <b>trick</b>: four cards, one from each player, highest of the led suit wins. Machiavelli builds melds on a table; bridge fights one small four-card battle thirteen times. Everything below is about winning more of those little battles than the other side.</p>
+    <p class="aside">One honest note before we start: bidding systems vary between clubs and teachers. Where this page gives numbers, they're the common UK (Acol) ones - <b>your teacher's version always wins</b>. What won't vary is the <i>why</i>, and the why is the bit that sticks.</p>
+  </section>
+
+  <!-- 2 · THE QUOTES WALL -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter two · The little quotes, pinned down</span>
+      <h2>Every saying, written down at last - with its why</h2>
+    </div>
+    <p class="lead">Tap any card to flip it. The front is the quote as you hear it at the table; the back is the reason it works, and the honest "unless…" where the rule bends.</p>
+
+    <div class="maxims">
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip red">♥</span>
+            <p class="quote">"Lead the top of a sequence."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mface mback">
+            <p class="why-h">Why it works</p>
+            <p>Touching honours (K-Q-J) are a battering ram - a Machiavelli run pointed at the enemy. Leading the <b>top</b> one loses nothing (the cards beneath it are equals) and tells partner exactly what you hold.</p>
+            <p class="unless"><b>Unless…</b> you only have two touching cards and nothing behind them - then it's a gentler suggestion, not a battering ram.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip">♠</span>
+            <p class="quote">"Second hand plays low."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mface mback">
+            <p class="why-h">Why it works</p>
+            <p>Your high cards exist to capture <b>their</b> high cards. If you rise with an ace in second seat, it usually eats a five. Play low, let the trick come round, and make your ace dine on a king.</p>
+            <p class="unless"><b>Unless…</b> an honour is led (cover an honour with an honour), or taking this exact trick defeats the contract - then grab it and smile.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip red">♦</span>
+            <p class="quote">"Third hand plays high."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mface mback">
+            <p class="why-h">Why it works</p>
+            <p>Partner led low, hoping. If you don't fight, declarer wins the trick with a cheap card. Playing your big card forces out <b>their</b> big card - a fair trade that promotes partner's middle cards. Proof one chapter down.</p>
+            <p class="unless"><b>Unless…</b> a smaller card does the same job: with Q-J together, play the J - the cheapest card that fights is the right one.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip">♣</span>
+            <p class="quote">"Cover an honour with an honour."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mface mback">
+            <p class="why-h">Why it works</p>
+            <p>If they lead a J and you hold the Q, covering forces <b>two</b> of their big cards for one of yours - and every smaller card you and partner hold moves up a rank. You trade one soldier to promote a whole row.</p>
+            <p class="unless"><b>Unless…</b> covering can't promote anything (you and partner hold no middle cards worth growing). Then keep the honour and let the J run.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip red">♥</span>
+            <p class="quote">"Fourth highest of your longest and strongest."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mface mback">
+            <p class="why-h">Why it works (leads vs no-trumps)</p>
+            <p>Long suits grow winners: once the big cards are gone, your little ones rule. Leading <b>low from length</b> keeps your honours together to capture theirs, and the "fourth highest" card is a coded message telling partner how long your suit is.</p>
+            <p class="unless"><b>Unless…</b> you hold a proper sequence in the suit - then the sequence rule outranks this one: lead the top of it.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip">♠</span>
+            <p class="quote">"Return partner's suit - best card up."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mface mback">
+            <p class="why-h">Why it works</p>
+            <p>Partner led that suit for a reason - two of you attacking the same wall beats attacking two walls. When you send it back, return the <b>higher of your two remaining cards</b>: it keeps the suit flowing without jamming it, and tells partner what you have left.</p>
+            <p class="unless"><b>Unless…</b> the sight of dummy makes it obvious the suit is dead - then find the better attack.</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip red">♦</span>
+            <p class="quote">"Draw trumps - get the children off the street."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mback mface">
+            <p class="why-h">Why it works (as declarer)</p>
+            <p>While opponents still hold trumps, any winner you cash can be ruffed - your ace mugged by a two. Pulling their trumps first makes the street safe for your good cards to go out and play.</p>
+            <p class="unless"><b>Unless…</b> you need dummy's trumps for ruffing your own losers first - then delay. (This is the "not always" your teacher keeps muttering.)</p>
+          </div>
+        </div>
+      </button>
+
+      <button class="maxim" type="button" aria-pressed="false">
+        <div class="maxim-inner">
+          <div class="mface mfront">
+            <span class="pip">♣</span>
+            <p class="quote">"Make your plan before playing to trick one."</p>
+            <span class="tap">Tap for the why</span>
+          </div>
+          <div class="mface mback">
+            <p class="why-h">Why it works</p>
+            <p>The moment dummy goes down is the only calm moment you get. Count your sure winners (or losers), find the suit that can grow, and decide the order of jobs <b>then</b> - not at trick seven when it's too late. Full walk-through two chapters down.</p>
+            <p class="unless"><b>Unless…</b> nothing. This one has no unless. Even the experts obey it.</p>
+          </div>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- 3 · THE PROOF -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter three · Proof, not faith</span>
+      <h2>One trick, played both ways</h2>
+    </div>
+    <p class="lead">Here's "third hand plays high" proven in front of you. One suit, all four hands face up. Partner (West) leads the 3. Dummy plays low. <b>You are East</b> - and you must choose: the brave Queen, or the careful ten. Play it both ways and watch the trick count change.</p>
+
+    <div class="table-felt">
+      <div class="seats">
+        <div class="seat seat-n">
+          <div class="seatlab">Dummy (North)</div>
+          <div class="handrow" style="justify-content:center;">
+            <span class="pcard red">7♥</span><span class="pcard red">4♥</span><span class="pcard red">2♥</span>
+          </div>
+        </div>
+        <div class="seat seat-w">
+          <div class="seatlab">Partner (West)</div>
+          <div class="handrow" style="justify-content:center;">
+            <span class="pcard red">K♥</span><span class="pcard red">9♥</span><span class="pcard red">6♥</span><span class="pcard red">3♥</span>
+          </div>
+        </div>
+        <div class="centre">Partner leads the ♥3. Dummy plays the ♥2. Your turn…</div>
+        <div class="seat seat-e you">
+          <div class="seatlab">You (East)</div>
+          <div class="handrow" style="justify-content:center;">
+            <span class="pcard red">Q♥</span><span class="pcard red">10♥</span><span class="pcard red">5♥</span>
+          </div>
+        </div>
+        <div class="seat seat-s">
+          <div class="seatlab">Declarer (South)</div>
+          <div class="handrow" style="justify-content:center;">
+            <span class="pcard red">A♥</span><span class="pcard red">J♥</span><span class="pcard red">8♥</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="choices">
+        <button class="btn" id="playQ" type="button">Play the Queen — third hand high</button>
+        <button class="btn" id="playT" type="button">Play the ten — save the Queen</button>
+        <button class="btn quiet" id="resetSim" type="button" style="display:none;">Play it the other way</button>
+      </div>
+
+      <div class="playout" id="playout" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 · BIDDING -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter four · Bidding, decoded</span>
+      <h2>Bidding is just telling partner your shape</h2>
+    </div>
+    <p class="lead">Forget mystique: the auction is a conversation in a language with about 30 words. Every bid says two things - <b>roughly how strong I am</b> and <b>roughly what shape I am</b>. Points measure the strength. Here's the count, on a real hand: tap each honour.</p>
+
+    <div class="panel">
+      <div class="legend">Ace = 4 · King = 3 · Queen = 2 · Jack = 1 (nothing else scores)</div>
+      <div class="hcp-hand">
+        <div class="hcp-suit"><span class="pip">♠</span>
+          <button class="hcard honour" type="button" data-pts="4">A</button>
+          <button class="hcard honour" type="button" data-pts="2">Q</button>
+          <span class="hcard">7</span><span class="hcard">4</span><span class="hcard">2</span>
+        </div>
+        <div class="hcp-suit"><span class="pip red">♥</span>
+          <button class="hcard honour red" type="button" data-pts="3">K</button>
+          <span class="hcard red">8</span><span class="hcard red">3</span>
+        </div>
+        <div class="hcp-suit"><span class="pip red">♦</span>
+          <button class="hcard honour red" type="button" data-pts="2">Q</button>
+          <button class="hcard honour red" type="button" data-pts="1">J</button>
+          <span class="hcard red">5</span>
+        </div>
+        <div class="hcp-suit"><span class="pip">♣</span>
+          <span class="hcard">9</span><span class="hcard">6</span>
+        </div>
+      </div>
+      <div class="hcp-total">
+        <span class="num" id="hcpNum">0</span>
+        <span>points so far</span>
+        <span class="hcp-msg" id="hcpMsg">Tap the aces, kings, queens and jacks.</span>
+      </div>
+    </div>
+
+    <p class="lead" style="margin-top:26px;">Now the ladder you're trying to remember. It's not twenty rules - it's four numbers:</p>
+    <div class="ladder">
+      <div class="rung"><span class="pts">12+</span><span class="what"><b>Open the bidding.</b> "Partner, I have a proper hand."</span></div>
+      <div class="rung"><span class="pts">6+</span><span class="what"><b>Respond.</b> "I heard you - I'm not empty-handed either."</span></div>
+      <div class="rung"><span class="pts">25</span><span class="what"><b>Between you: bid a game.</b> 3NT or four of a major. This is the number the whole auction is trying to discover.</span></div>
+      <div class="rung"><span class="pts">33</span><span class="what"><b>Between you: slam territory.</b> A rare treat. Don't live here.</span></div>
+    </div>
+
+    <p class="lead" style="margin-top:26px;">And your exact question - <b>"what tells me partner has a five-card suit?"</b> - has a lovely one-line answer:</p>
+    <div class="panel">
+      <p style="font-size:17px; margin:0 0 10px;"><b>A suit bid once promises four. Bid it again: five. Again: six.</b></p>
+      <p class="why" style="margin:0;">Partner doesn't repeat a suit for fun - repeating it is the <i>only</i> way to say "there are more of these than I first let on." So 1♠ then 2♠ = five spades. 1♠, 2♠, 3♠ = six. And a 1NT opening (12-14, balanced) says the opposite: "no long suit to shout about - I'm flat as a pancake."</p>
+    </div>
+  </section>
+
+  <!-- 5 · THE PLAN -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter five · Before you touch a card</span>
+      <h2>The plan: count, then play</h2>
+    </div>
+    <p class="lead">You're declarer in <b>3NT</b> - nine tricks needed. Dummy has just gone down. Here are both hands; the stepper underneath is the exact thinking, in order. This is all "make a plan" means.</p>
+
+    <div class="panel">
+      <div class="duo">
+        <div>
+          <div class="seatlab">Dummy (North)</div>
+          <div class="hcp-hand" style="margin:8px 0 0;">
+            <div class="hcp-suit"><span class="pip">♠</span><span class="hcard">9</span><span class="hcard">6</span><span class="hcard">2</span></div>
+            <div class="hcp-suit"><span class="pip red">♥</span><span class="hcard red">A</span><span class="hcard red">K</span><span class="hcard red">3</span></div>
+            <div class="hcp-suit"><span class="pip red">♦</span><span class="hcard red">8</span><span class="hcard red">5</span><span class="hcard red">4</span></div>
+            <div class="hcp-suit"><span class="pip">♣</span><span class="hcard">K</span><span class="hcard">6</span><span class="hcard">4</span><span class="hcard">2</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="seatlab">You (South, declarer)</div>
+          <div class="hcp-hand" style="margin:8px 0 0;">
+            <div class="hcp-suit"><span class="pip">♠</span><span class="hcard">A</span><span class="hcard">K</span><span class="hcard">4</span></div>
+            <div class="hcp-suit"><span class="pip red">♥</span><span class="hcard red">8</span><span class="hcard red">5</span><span class="hcard red">2</span></div>
+            <div class="hcp-suit"><span class="pip red">♦</span><span class="hcard red">K</span><span class="hcard red">Q</span><span class="hcard red">J</span><span class="hcard red">10</span></div>
+            <div class="hcp-suit"><span class="pip">♣</span><span class="hcard">A</span><span class="hcard">9</span><span class="hcard">3</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stepper">
+        <div class="step-body" id="stepBody"></div>
+        <div class="step-nav">
+          <button class="btn ink" id="stepPrev" type="button">Back</button>
+          <button class="btn" id="stepNext" type="button">Next step</button>
+          <span class="step-count" id="stepCount"></span>
+        </div>
+      </div>
+    </div>
+
+    <p class="aside">In a <b>suit contract</b> the same habit flips: count your <b>losers</b> instead of winners, then ask which ones can be ruffed away or thrown on dummy's spares. Same pause, same question: "where do the missing tricks come from?"</p>
+  </section>
+
+  <!-- 6 · ENTRIES -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter six · Access to dummy</span>
+      <h2>Entries: an ace isn't just a winner, it's a door</h2>
+    </div>
+    <p class="lead">The game is called bridge. Treat dummy as an island: every high card that can win a trick over there is a <b>bridge across</b> - and once you've crossed and come back, that bridge is burned.</p>
+    <div class="panel">
+      <p>Look back at the 3NT hand above. Dummy's diamond helpers are worthless, but suppose it were dummy holding those lovely established diamonds instead. The question changes from "can I win tricks?" to <b>"can I get there to cash them?"</b></p>
+      <p>That's why you'll hear "keep the ♥A in dummy till last". It isn't superstition. The ace has two jobs - winning a trick <i>and</i> carrying you across the table - and it can only do both if you spend it <b>late</b>. Cash it at trick two "because it's a winner" and dummy's remaining winners sit marooned on the island, waving.</p>
+      <p class="why" style="margin-bottom:0;"><b>The habit:</b> before you play any ace or king, ask one question - "is this card also a door I still need?" That single question is 90% of entry management.</p>
+    </div>
+  </section>
+
+  <!-- 7 · MEMORY -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter seven · The 😱 chapter</span>
+      <h2>"Who has what?" - you don't memorise it, you count it</h2>
+    </div>
+    <p class="lead">Here's the secret nobody says out loud: <b>good players don't remember 52 cards.</b> Not one of them. They count <b>one suit at a time, to thirteen</b> - usually just trumps.</p>
+    <div class="panel">
+      <p>Every suit has exactly 13 cards. You can see your hand and dummy's, so before a single card is played you already know how many the hidden hands hold: <b>13, minus mine, minus dummy's</b>. If you have five trumps and dummy has three, the opponents have five. That's it - one small number, not a memory palace.</p>
+      <p>Then, as trumps get played, count the opponents' down: "five… three… one… none - safe." One running number. You already do exactly this in Machiavelli when you track what's out on the table; bridge just shrinks it to a single suit.</p>
+      <p class="why" style="margin-bottom:0;"><b>Start with trumps only.</b> Counting one suit per hand, every hand, is how everyone at your club learned. The second suit comes free later, without trying. Nobody starts by counting four.</p>
+    </div>
+  </section>
+
+  <!-- 8 · SCORING -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter eight · Scoring, made small</span>
+      <h2>Why everyone gallops towards 3NT</h2>
+    </div>
+    <p class="lead">Scoring looks like an accountant's fever dream, but the whole engine is one number: <b>100 points wins a game</b>. Each trick you contract for (beyond the first six) is worth:</p>
+    <div class="panel">
+      <div class="score-chips">
+        <span class="chip">♣ ♦ minors · 20 a trick</span>
+        <span class="chip"><span class="pip red">♥ ♠</span> majors · 30 a trick</span>
+        <span class="chip">NT · 40 first, then 30</span>
+      </div>
+      <p class="why">So the routes to 100 are:</p>
+      <div class="ladder" style="margin-top:6px;">
+        <div class="rung"><span class="pts">3NT</span><span class="what">40 + 30 + 30 = 100 → only <b>9 tricks</b></span></div>
+        <div class="rung"><span class="pts">4♥ 4♠</span><span class="what">30 × 4 = 120 → <b>10 tricks</b></span></div>
+        <div class="rung"><span class="pts">5♣ 5♦</span><span class="what">20 × 5 = 100 → <b>11 tricks</b> (!)</span></div>
+      </div>
+      <div class="goal"><b>That's the entire mystery.</b> 3NT is the cheapest game on the menu - nine tricks instead of eleven - which is why the whole room stampedes towards it. Game bonuses and doubles are just decoration on top of this one idea.</div>
+    </div>
+  </section>
+
+  <!-- 9 · CLOSE -->
+  <section>
+    <div class="sec-head">
+      <span class="kicker">Chapter nine · About those silly mistakes</span>
+      <h2>Everyone makes them. Truly everyone.</h2>
+    </div>
+    <p class="lead">The players who look confident at your club are not making fewer decisions than you - they've just automated the quotes on this page so their brains are free to count one suit. That's the whole difference, and it comes from repetition, which is exactly what you said you weren't getting. Now the quotes live here instead of evaporating.</p>
+    <p class="lead">And bridge is a kind game to learn in one respect: a mistake costs one hand, and a completely fresh deal arrives a few minutes later. If you do just two things next time you play - <b>make a plan at trick one</b> and <b>count trumps to thirteen</b> - you'll already be playing better bridge than most of the table.</p>
+  </section>
+
+  <footer>
+    Made for Francine, after a very good dinner. Payment accepted in salad recipes. 🥗
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  // ----- maxim flip cards -----
+  document.querySelectorAll(".maxim").forEach(function (card) {
+    card.addEventListener("click", function () {
+      var on = card.classList.toggle("flipped");
+      card.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  });
+
+  // ----- trick simulator -----
+  var C = function (txt, win) { return { t: txt, w: !!win }; };
+  var lines = {
+    Q: {
+      tricks: [
+        { cards: [C("3♥"), C("2♥"), C("Q♥"), C("A♥", true)], seats: ["W","N","You","S"],
+          note: "Your Queen forces out the Ace - an honour for an honour. A fair trade, not a loss." },
+        { cards: [C("J♥"), C("K♥", true), C("4♥"), C("5♥")], seats: ["S","W","N","You"],
+          note: "Declarer tries the Jack - the biggest card he has left. Partner's King says no." },
+        { cards: [C("6♥"), C("7♥"), C("10♥", true), C("8♥")], seats: ["W","N","You","S"],
+          note: "Your ten - promoted from middle child to trick-winner by the Queen's sacrifice." },
+        { cards: [C("9♥", true)], seats: ["W"],
+          note: "Partner's 9 collects the last round. Nobody else has a heart left." }
+      ],
+      verdict: "<b>Third hand high: defenders 3 tricks, declarer 1.</b> The Queen died so the King, ten and nine could rule."
+    },
+    T: {
+      tricks: [
+        { cards: [C("3♥"), C("2♥"), C("10♥"), C("J♥", true)], seats: ["W","N","You","S"],
+          note: "The Jack wins a trick it never deserved - your ten wasn't enough of a fight." },
+        { cards: [C("A♥", true), C("6♥"), C("4♥"), C("5♥")], seats: ["S","W","N","You"],
+          note: "Now the Ace is cashed… and captures a six, a four and a five. It ate nothing." },
+        { cards: [C("8♥"), C("9♥"), C("7♥"), C("Q♥", true)], seats: ["S","W","N","You"],
+          note: "Your Queen finally scores - the trick it was always going to get." },
+        { cards: [C("K♥", true)], seats: ["W"],
+          note: "Partner's King takes the last round." }
+      ],
+      verdict: "<b>Saving the Queen: defenders 2 tricks, declarer 2.</b> The careful ten handed declarer a cheap Jack - one whole trick, gone. Same cards, different courage."
+    }
+  };
+
+  var playout = document.getElementById("playout");
+  var btnQ = document.getElementById("playQ");
+  var btnT = document.getElementById("playT");
+  var btnR = document.getElementById("resetSim");
+
+  function renderLine(key) {
+    var line = lines[key];
+    var html = "";
+    line.tricks.forEach(function (trick, i) {
+      html += '<div class="trickrow"><span class="tno">Trick ' + (i + 1) + '</span><span class="cards">';
+      trick.cards.forEach(function (c, j) {
+        html += '<span class="pcard red' + (c.w ? " winner" : "") + '" title="' + trick.seats[j] + '">' + c.t + "</span>";
+      });
+      html += "</span><span class=\"note\">" + trick.note + "</span></div>";
+    });
+    html += '<div class="verdict">' + line.verdict + "</div>";
+    playout.innerHTML = html;
+    playout.classList.add("show");
+    btnR.style.display = "inline-block";
+  }
+
+  btnQ.addEventListener("click", function () { renderLine("Q"); });
+  btnT.addEventListener("click", function () { renderLine("T"); });
+  btnR.addEventListener("click", function () {
+    playout.classList.remove("show");
+    playout.innerHTML = "";
+    btnR.style.display = "none";
+  });
+
+  // ----- HCP counter -----
+  var total = 0;
+  var honours = document.querySelectorAll(".hcard.honour");
+  var num = document.getElementById("hcpNum");
+  var msg = document.getElementById("hcpMsg");
+  honours.forEach(function (h) {
+    h.addEventListener("click", function () {
+      var pts = parseInt(h.getAttribute("data-pts"), 10);
+      if (h.classList.toggle("counted")) total += pts; else total -= pts;
+      num.textContent = total;
+      var allDone = Array.prototype.every.call(honours, function (x) { return x.classList.contains("counted"); });
+      if (allDone) {
+        msg.textContent = "That's the lot: 12 points and five spades. Open 1♠ - out loud it means: \"Partner, I have a proper hand and spades is my longest suit.\"";
+        msg.classList.add("done");
+      } else {
+        msg.textContent = total > 0 ? "Keep going - honours only." : "Tap the aces, kings, queens and jacks.";
+        msg.classList.remove("done");
+      }
+    });
+  });
+
+  // ----- plan stepper -----
+  var steps = [
+    { h: "Step 1 · Count the tricks you already own",
+      b: "Top cards that cannot lose: ♠A, ♠K, ♥A, ♥K, ♣A, ♣K. That's 6 sure tricks. You need 9. Don't play a card yet." },
+    { h: "Step 2 · Find the suit that can grow",
+      b: "Three tricks short. Look for length and near-sequences - your Machiavelli eye spots it instantly: ♦K-Q-J-10, a perfect run missing only its head, the Ace." },
+    { h: "Step 3 · Knock out their Ace - early",
+      b: "Lead diamonds at the first chance. They win their Ace (they were always going to), and your K-Q-J are promoted: three grown-up winners. 6 + 3 = 9." },
+    { h: "Step 4 · Why early? Because of the doors",
+      b: "While you still hold aces and kings in the other suits, the opponents can't run off with tricks when they're in with that ♦A. Lose the trick you must lose while every other suit is still guarded. That's the entire plan - four thoughts, before trick one." }
+  ];
+  var idx = 0;
+  var body = document.getElementById("stepBody");
+  var count = document.getElementById("stepCount");
+  var prev = document.getElementById("stepPrev");
+  var next = document.getElementById("stepNext");
+  function showStep() {
+    body.innerHTML = "<h3>" + steps[idx].h + "</h3><p>" + steps[idx].b + "</p>";
+    count.textContent = "Step " + (idx + 1) + " of " + steps.length;
+    prev.disabled = idx === 0;
+    next.disabled = idx === steps.length - 1;
+  }
+  prev.addEventListener("click", function () { if (idx > 0) { idx--; showStep(); } });
+  next.addEventListener("click", function () { if (idx < steps.length - 1) { idx++; showStep(); } });
+  showStep();
+})();
+</script>
+</body>
+</html>
