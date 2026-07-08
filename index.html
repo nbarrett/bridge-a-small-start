@@ -309,6 +309,33 @@
   @media (max-width: 639px) {
     .sec-head .vig { margin-top: 6px; }
   }
+
+  /* step icons */
+  .step-body { display: flex; gap: 18px; align-items: flex-start; }
+  .stepicon { flex: 0 0 66px; }
+  .stepicon svg { width: 66px; height: 66px; display: block; }
+  .steptxt h3 { margin-top: 0; }
+
+  /* memory: 13 = mine + dummy's + theirs */
+  .count-strip { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end; margin: 20px 0 8px; }
+  .cgroup { display: grid; gap: 7px; justify-items: center; }
+  .cgroup .rowc { display: flex; gap: 3px; }
+  .mini { width: 20px; height: 28px; border-radius: 3px; }
+  .mini.mine { background: #fff; border: 1px solid #C9BFA6; }
+  .mini.dum { background: #F3EDDC; border: 1px solid #C9BFA6; }
+  .mini.them { background: repeating-linear-gradient(45deg, #7E2B2B 0 3px, #942F2F 3px 6px); border: 1.5px solid #E8DFC8; }
+  .cgroup .lab {
+    font-family: var(--sans); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .eqchip {
+    font-family: var(--sans); font-size: 13.5px; font-weight: 700; color: var(--gold-deep);
+    background: #FDF3DC; border: 1px solid #EBD9AC; border-radius: 999px; padding: 8px 13px;
+    align-self: center; white-space: nowrap;
+  }
+
+  /* entries: island diagram */
+  .isles { width: 100%; max-width: 470px; height: auto; display: block; margin: 20px auto 8px; }
   .mfront { position: relative; }
   .mfront .pip.corner {
     position: absolute; bottom: 12px; right: 14px; transform: rotate(180deg); font-size: 22px;
@@ -687,6 +714,26 @@
     <div class="panel">
       <p>Look back at the 3NT hand above. Dummy's diamond helpers are worthless, but suppose it were dummy holding those lovely established diamonds instead. The question changes from "can I win tricks?" to <b>"can I get there to cash them?"</b></p>
       <p>That's why you'll hear "keep the ♥A in dummy till last". It isn't superstition. The ace has two jobs - winning a trick <i>and</i> carrying you across the table - and it can only do both if you spend it <b>late</b>. Cash it at trick two "because it's a winner" and dummy's remaining winners sit marooned on the island, waving.</p>
+      <svg class="isles" viewBox="0 0 460 138" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="0" y="6" width="460" height="126" rx="14" fill="#1D4A39"/>
+        <rect x="52" y="56" width="46" height="60" rx="5" fill="#FBF7EC" stroke="#D8D0BC"/>
+        <rect x="60" y="50" width="46" height="60" rx="5" fill="#FFFFFF" stroke="#D8D0BC"/>
+        <text x="83" y="42" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#A8C3B4" text-anchor="middle">your hand</text>
+        <g font-family="Helvetica,Arial,sans-serif" font-weight="700" font-size="10">
+          <rect x="296" y="66" width="26" height="36" rx="4" fill="#FFFFFF" stroke="#D8D0BC"/><text x="301" y="80" fill="#BE3B3B">Q</text><text x="301" y="94" fill="#BE3B3B" font-size="11">♦</text>
+          <rect x="326" y="66" width="26" height="36" rx="4" fill="#FFFFFF" stroke="#D8D0BC"/><text x="331" y="80" fill="#BE3B3B">J</text><text x="331" y="94" fill="#BE3B3B" font-size="11">♦</text>
+          <rect x="356" y="66" width="26" height="36" rx="4" fill="#FFFFFF" stroke="#D8D0BC"/><text x="359" y="80" fill="#BE3B3B">10</text><text x="361" y="94" fill="#BE3B3B" font-size="11">♦</text>
+          <rect x="386" y="66" width="26" height="36" rx="4" fill="#FFFFFF" stroke="#D8D0BC"/><text x="391" y="80" fill="#BE3B3B">9</text><text x="391" y="94" fill="#BE3B3B" font-size="11">♦</text>
+        </g>
+        <text x="354" y="42" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#A8C3B4" text-anchor="middle">dummy's winners</text>
+        <path d="M 106 56 Q 230 4 296 56" fill="none" stroke="#D9A441" stroke-width="3" stroke-linecap="round"/>
+        <g transform="rotate(-4 230 26)">
+          <rect x="217" y="8" width="26" height="36" rx="4" fill="#FFFFFF" stroke="#D9A441" stroke-width="2"/>
+          <text x="222" y="22" font-size="10" font-family="Helvetica,Arial,sans-serif" font-weight="700" fill="#BE3B3B">A</text>
+          <text x="222" y="37" font-size="12" fill="#BE3B3B">♥</text>
+        </g>
+        <text x="230" y="124" font-size="12.5" font-family="Georgia,serif" font-style="italic" fill="#D9A441" text-anchor="middle">the ♥A is the bridge - spend it last</text>
+      </svg>
       <p class="why" style="margin-bottom:0;"><b>The habit:</b> before you play any ace or king, ask one question - "is this card also a door I still need?" That single question is 90% of entry management.</p>
     </div>
   </section>
@@ -700,6 +747,21 @@
     <p class="lead">Here's the secret nobody says out loud: <b>good players don't remember 52 cards.</b> Not one of them. They count <b>one suit at a time, to thirteen</b> - usually just trumps.</p>
     <div class="panel">
       <p>Every suit has exactly 13 cards. You can see your hand and dummy's, so before a single card is played you already know how many the hidden hands hold: <b>13, minus mine, minus dummy's</b>. If you have five trumps and dummy has three, the opponents have five. That's it - one small number, not a memory palace.</p>
+      <div class="count-strip" aria-hidden="true">
+        <div class="cgroup">
+          <div class="rowc"><span class="mini mine"></span><span class="mini mine"></span><span class="mini mine"></span><span class="mini mine"></span><span class="mini mine"></span></div>
+          <span class="lab">mine · 5</span>
+        </div>
+        <div class="cgroup">
+          <div class="rowc"><span class="mini dum"></span><span class="mini dum"></span><span class="mini dum"></span></div>
+          <span class="lab">dummy's · 3</span>
+        </div>
+        <span class="eqchip">13 − 5 − 3 =</span>
+        <div class="cgroup">
+          <div class="rowc"><span class="mini them"></span><span class="mini them"></span><span class="mini them"></span><span class="mini them"></span><span class="mini them"></span></div>
+          <span class="lab">theirs · 5</span>
+        </div>
+      </div>
       <p>Then, as trumps get played, count the opponents' down: "five… three… one… none - safe." One running number. You already do exactly this in Machiavelli when you track what's out on the table; bridge just shrinks it to a single suit.</p>
       <p class="why" style="margin-bottom:0;"><b>Start with trumps only.</b> Counting one suit per hand, every hand, is how everyone at your club learned. The second suit comes free later, without trying. Nobody starts by counting four.</p>
     </div>
@@ -899,6 +961,16 @@
   });
 
   // ----- plan stepper -----
+  var STEPICONS = [
+    // 1 count: stacked cards + "6" badge
+    '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="14" width="24" height="34" rx="4" fill="#fff" stroke="#C9BFA6"/><rect x="14" y="10" width="24" height="34" rx="4" fill="#FBF7EC" stroke="#C9BFA6"/><rect x="22" y="6" width="24" height="34" rx="4" fill="#fff" stroke="#C9BFA6"/><circle cx="44" cy="47" r="13" fill="#D9A441"/><text x="40" y="52.5" font-size="15" font-family="Helvetica,Arial,sans-serif" font-weight="700" fill="#2A2008">6</text></svg>',
+    // 2 grow: rising diamonds + arrow
+    '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><text x="6" y="54" font-size="16" fill="#BE3B3B">♦</text><text x="19" y="44" font-size="19" fill="#BE3B3B">♦</text><text x="33" y="34" font-size="23" fill="#BE3B3B">♦</text><path d="M53 28 L53 10 M46 17 L53 9 L60 17" stroke="#D9A441" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    // 3 knock out the ace
+    '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(8 40 32)"><rect x="26" y="10" width="30" height="42" rx="4" fill="#fff" stroke="#C9BFA6"/><text x="31" y="27" font-size="14" font-family="Helvetica,Arial,sans-serif" font-weight="700" fill="#BE3B3B">A</text><text x="31" y="45" font-size="15" fill="#BE3B3B">♦</text></g><path d="M4 46 L20 35 M20 35 L11.5 35 M20 35 L16.5 43" stroke="#D9A441" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    // 4 the doors hold
+    '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M14 56 L14 30 Q32 8 50 30 L50 56" fill="none" stroke="#D9A441" stroke-width="3.5" stroke-linecap="round"/><line x1="7" y1="56" x2="57" y2="56" stroke="#C9BFA6" stroke-width="3" stroke-linecap="round"/><text x="25" y="46" font-size="16" fill="#BE3B3B">♥</text></svg>'
+  ];
   var steps = [
     { h: "Step 1 · Count the tricks you already own",
       b: "Top cards that cannot lose: ♠A, ♠K, ♥A, ♥K, ♣A, ♣K. That's 6 sure tricks. You need 9. Don't play a card yet." },
@@ -915,7 +987,7 @@
   var prev = document.getElementById("stepPrev");
   var next = document.getElementById("stepNext");
   function showStep() {
-    body.innerHTML = "<h3>" + steps[idx].h + "</h3><p>" + steps[idx].b + "</p>";
+    body.innerHTML = '<div class="stepicon" aria-hidden="true">' + STEPICONS[idx] + '</div><div class="steptxt"><h3>' + steps[idx].h + "</h3><p>" + steps[idx].b + "</p></div>";
     body.classList.remove("fade"); void body.offsetWidth; body.classList.add("fade");
     count.textContent = "Step " + (idx + 1) + " of " + steps.length;
     prev.disabled = idx === 0;
